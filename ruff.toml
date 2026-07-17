@@ -1,8 +1,7 @@
-[tool.ruff]
 line-length = 100
 target-version = "py312"
 exclude = ["api/alembic/versions/"]
 
-[tool.ruff.lint]
+[lint]
 select = ["E", "F", "W", "I", "UP"]
 ignore = ["E501"]

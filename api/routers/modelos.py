@@ -32,18 +32,6 @@ def listar_modelos(
 
 
 @router.get(
-    "/{modelo_id}",
-    response_model=ModeloResumido,
-    summary="Detalhe de um modelo",
-)
-def detalhe_modelo(modelo_id: int, db: Session = Depends(get_db)):
-    modelo = db.get(Modelo, modelo_id)
-    if not modelo:
-        raise HTTPException(status_code=404, detail="Modelo não encontrado.")
-    return modelo
-
-
-@router.get(
     "/{modelo_id}/anos",
     response_model=list[AnoResumido],
     summary="Anos disponíveis de um modelo",

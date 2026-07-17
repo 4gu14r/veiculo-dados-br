@@ -5,7 +5,6 @@ Cada teste usa o banco SQLite in-memory via conftest.py.
 
 from api.models.veiculo import Marca, Modelo, ModeloAno, Versao, VersaoDetalhe
 
-
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 def criar_marca(db, nome="Fiat") -> Marca:
@@ -89,19 +88,6 @@ def test_listar_marcas_filtro(client, db):
     assert r.json()[0]["nome"] == "Fiat"
 
 
-def test_detalhe_marca(client, db):
-    marca = criar_marca(db)
-    db.commit()
-    r = client.get(f"/api/v1/marcas/{marca.id}")
-    assert r.status_code == 200
-    assert r.json()["nome"] == "Fiat"
-
-
-def test_marca_nao_encontrada(client):
-    r = client.get("/api/v1/marcas/9999")
-    assert r.status_code == 404
-
-
 def test_modelos_da_marca(client, db):
     marca = criar_marca(db)
     criar_modelo(db, marca.id, "Uno")
@@ -123,13 +109,9 @@ def test_listar_modelos(client, db):
     assert len(r.json()) == 1
 
 
-def test_detalhe_modelo(client, db):
-    marca = criar_marca(db)
-    modelo = criar_modelo(db, marca.id, "Gol")
-    db.commit()
-    r = client.get(f"/api/v1/modelos/{modelo.id}")
-    assert r.status_code == 200
-    assert r.json()["nome"] == "Gol"
+def test_modelo_nao_encontrado_ao_listar_anos(client):
+    r = client.get("/api/v1/modelos/9999/anos")
+    assert r.status_code == 404
 
 
 def test_anos_do_modelo(client, db):
@@ -143,20 +125,6 @@ def test_anos_do_modelo(client, db):
     anos = [a["ano"] for a in r.json()]
     assert 2020 in anos
     assert 2021 in anos
-
-
-# ── Anos ───────────────────────────────────────────────────────────────────────
-
-def test_versoes_do_ano(client, db):
-    marca = criar_marca(db)
-    modelo = criar_modelo(db, marca.id)
-    ano = criar_ano(db, modelo.id, 2022)
-    criar_versao(db, ano.id, "1.0 Fire Flex", "http://a.com/1")
-    criar_versao(db, ano.id, "1.4 Attractive", "http://a.com/2")
-    db.commit()
-    r = client.get(f"/api/v1/anos/{ano.id}/versoes")
-    assert r.status_code == 200
-    assert len(r.json()) == 2
 
 
 # ── Versões ────────────────────────────────────────────────────────────────────
@@ -193,3 +161,19 @@ def test_listar_versoes_por_ano(client, db):
     r = client.get("/api/v1/versoes?ano=2019")
     assert r.status_code == 200
     assert len(r.json()) == 1
+
+
+def test_listar_versoes_por_modelo_e_ano(client, db):
+    """Cobre o caso que antes era resolvido por /api/v1/anos/{id}/versoes."""
+    marca  = criar_marca(db)
+    modelo = criar_modelo(db, marca.id)
+    ano_2022 = criar_ano(db, modelo.id, 2022)
+    ano_2023 = criar_ano(db, modelo.id, 2023)
+    criar_versao(db, ano_2022.id, "1.0 Fire Flex",  "http://a.com/1")
+    criar_versao(db, ano_2022.id, "1.4 Attractive", "http://a.com/2")
+    criar_versao(db, ano_2023.id, "1.0 Firefly",    "http://a.com/3")
+    db.commit()
+
+    r = client.get(f"/api/v1/versoes?modelo_id={modelo.id}&ano=2022")
+    assert r.status_code == 200
+    assert len(r.json()) == 2

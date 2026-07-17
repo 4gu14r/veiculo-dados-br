@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from api.core.database import get_db
 from api.models.veiculo import Marca, Modelo
-from api.schemas.veiculo import MarcaComModelos, MarcaResumida, ModeloResumido
+from api.schemas.veiculo import MarcaResumida, ModeloResumido
 
 router = APIRouter()
 
@@ -26,18 +26,6 @@ def listar_marcas(
         stmt = stmt.where(Marca.nome.ilike(f"%{q}%"))
     stmt = stmt.offset((pagina - 1) * limite).limit(limite)
     return db.scalars(stmt).all()
-
-
-@router.get(
-    "/{marca_id}",
-    response_model=MarcaResumida,
-    summary="Detalhe de uma marca",
-)
-def detalhe_marca(marca_id: int, db: Session = Depends(get_db)):
-    marca = db.get(Marca, marca_id)
-    if not marca:
-        raise HTTPException(status_code=404, detail="Marca não encontrada.")
-    return marca
 
 
 @router.get(
