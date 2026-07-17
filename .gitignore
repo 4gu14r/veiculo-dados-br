@@ -1,5 +1,26 @@
-venv
+# Ambiente
+.env
+.venv/
+venv/
 __pycache__/
-database/veiculos.db
-*.sqlite
+*.pyc
+*.pyo
+
+# Banco legado
 *.db
+*.sqlite
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build
+dist/
+*.egg-info/
+.eggs/
+
+# IDEs
+.vscode/
+.idea/
+*.swp

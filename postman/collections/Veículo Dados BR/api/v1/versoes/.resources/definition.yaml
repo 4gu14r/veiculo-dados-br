@@ -1,0 +1,4 @@
+$kind: collection
+order: 4000
+description: |-
+  Endpoints for vehicle trim levels (versões). Supports listing all versions with optional filtering by year or model ID, and retrieving the complete technical specification sheet (ficha técnica) for a specific version.

@@ -1,0 +1,4 @@
+$kind: collection
+order: 2000
+description: |-
+  Endpoints for vehicle models (modelos). Supports listing all models with optional filtering by name or brand ID, and retrieving the full details of a specific model by its ID.

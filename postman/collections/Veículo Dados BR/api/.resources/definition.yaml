@@ -1,0 +1,4 @@
+$kind: collection
+order: 1000
+description: |-
+  Root namespace for all versioned API endpoints. Contains the full set of resources exposed by the Veículo Dados BR API, organized by version.

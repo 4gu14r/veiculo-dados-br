@@ -1,0 +1,4 @@
+$kind: collection
+order: 1000
+description: |-
+  Operations scoped to a specific model year identified by `ano_id`. Retrieve year details or list all trim levels (versões) available for this model-year.

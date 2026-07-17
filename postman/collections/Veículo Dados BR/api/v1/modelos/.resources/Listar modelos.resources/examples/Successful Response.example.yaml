@@ -1,0 +1,40 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/modelos?q=string&marca_id=3841&limite=100&pagina=1"
+  method: GET
+  headers:
+    Accept: application/json
+  queryParams:
+    - key: q
+      value: string
+      description: Filtrar por nome (parcial, case-insensitive)
+    - key: marca_id
+      value: "3841"
+      description: Filtrar por ID de marca
+    - key: limite
+      value: "100"
+    - key: pagina
+      value: "1"
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "id": 1790,
+          "nome": "string",
+          "url": "string",
+          "marca_id": 5566
+        },
+        {
+          "id": 6536,
+          "nome": "string",
+          "url": "string",
+          "marca_id": 3443
+        }
+      ]
+order: 1000

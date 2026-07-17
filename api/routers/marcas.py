@@ -1,32 +1,68 @@
-# api/routers/marcas.py
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session, select
-from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
 
-from database.database import get_session
-from api.models import Marca, MarcaBase, MarcaRead, MarcaReadWithModelos
+from api.core.database import get_db
+from api.models.veiculo import Marca, Modelo
+from api.schemas.veiculo import MarcaComModelos, MarcaResumida, ModeloResumido
 
-router = APIRouter(prefix="/marcas", tags=["Marcas"])
+router = APIRouter()
 
-@router.get("/", response_model=List[MarcaReadWithModelos])  # 🌟 Retorna a árvore completa sem loop!
-def listar_marcas(session: Session = Depends(get_session)):
-    marcas = session.exec(select(Marca)).all()
-    return marcas
 
-@router.post("/", response_model=MarcaRead, status_code=status.HTTP_201_CREATED)
-def cadastrar_marca(marca_payload: MarcaBase, session: Session = Depends(get_session)):
-    marca_existente = session.exec(
-        select(Marca).where(Marca.nome == marca_payload.nome)
-    ).first()
-    
-    if marca_existente:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Esta marca já está cadastrada."
-        )
-    
-    nova_marca = Marca(nome=marca_payload.nome)
-    session.add(nova_marca)
-    session.commit()
-    session.refresh(nova_marca)
-    return nova_marca
+@router.get(
+    "",
+    response_model=list[MarcaResumida],
+    summary="Listar marcas",
+    description="Retorna todas as marcas cadastradas. Suporta filtro por nome.",
+)
+def listar_marcas(
+    q:      str | None = Query(None, description="Filtrar por nome (parcial, case-insensitive)"),
+    limite: int        = Query(100, ge=1, le=200, description="Itens por página"),
+    pagina: int        = Query(1, ge=1, description="Número da página"),
+    db:     Session    = Depends(get_db),
+):
+    stmt = select(Marca).order_by(Marca.nome)
+    if q:
+        stmt = stmt.where(Marca.nome.ilike(f"%{q}%"))
+    stmt = stmt.offset((pagina - 1) * limite).limit(limite)
+    return db.scalars(stmt).all()
+
+
+@router.get(
+    "/{marca_id}",
+    response_model=MarcaResumida,
+    summary="Detalhe de uma marca",
+)
+def detalhe_marca(marca_id: int, db: Session = Depends(get_db)):
+    marca = db.get(Marca, marca_id)
+    if not marca:
+        raise HTTPException(status_code=404, detail="Marca não encontrada.")
+    return marca
+
+
+@router.get(
+    "/{marca_id}/modelos",
+    response_model=list[ModeloResumido],
+    summary="Modelos de uma marca",
+    description="Retorna todos os modelos de uma determinada marca.",
+)
+def modelos_da_marca(
+    marca_id: int,
+    q:        str | None = Query(None, description="Filtrar por nome do modelo"),
+    limite:   int        = Query(100, ge=1, le=200),
+    pagina:   int        = Query(1, ge=1),
+    db:       Session    = Depends(get_db),
+):
+    if not db.get(Marca, marca_id):
+        raise HTTPException(status_code=404, detail="Marca não encontrada.")
+
+    stmt = (
+        select(Modelo)
+        .where(Modelo.marca_id == marca_id)
+        .order_by(Modelo.nome)
+        .offset((pagina - 1) * limite)
+        .limit(limite)
+    )
+    if q:
+        stmt = stmt.where(Modelo.nome.ilike(f"%{q}%"))
+    return db.scalars(stmt).all()

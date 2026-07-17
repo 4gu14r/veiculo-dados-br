@@ -1,0 +1,4 @@
+$kind: collection
+order: 1000
+description: |-
+  Operations scoped to a specific trim level identified by `versao_id`. Retrieve the full technical specification sheet (ficha técnica completa) for this version, including all available vehicle attributes.

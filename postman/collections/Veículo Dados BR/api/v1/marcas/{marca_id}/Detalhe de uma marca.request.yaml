@@ -1,0 +1,10 @@
+$kind: http-request
+description: Returns the full details of a specific brand identified by `marca_id`, including its name and any associated metadata.
+url: "{{baseUrl}}/api/v1/marcas/:marca_id"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  marca_id: "2277"
+examples: ./.resources/Detalhe de uma marca.resources/examples
+order: 2000

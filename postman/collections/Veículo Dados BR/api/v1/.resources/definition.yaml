@@ -1,0 +1,4 @@
+$kind: collection
+order: 1000
+description: |-
+  Version 1 of the Veículo Dados BR API. Provides endpoints for browsing and querying Brazilian vehicle data, including brands (marcas), models (modelos), model years (anos), and trim levels (versões).

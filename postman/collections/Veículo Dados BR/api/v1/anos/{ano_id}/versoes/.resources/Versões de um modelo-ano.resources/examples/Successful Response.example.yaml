@@ -1,0 +1,32 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/anos/:ano_id/versoes?limite=100&pagina=1"
+  method: GET
+  headers:
+    Accept: application/json
+  queryParams:
+    limite: "100"
+    pagina: "1"
+  pathVariables:
+    ano_id: "657"
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "id": 749,
+          "versao": "string",
+          "url": "string"
+        },
+        {
+          "id": 9960,
+          "versao": "string",
+          "url": "string"
+        }
+      ]
+order: 1000

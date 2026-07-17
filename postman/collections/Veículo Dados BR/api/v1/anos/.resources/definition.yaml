@@ -1,0 +1,4 @@
+$kind: collection
+order: 3000
+description: |-
+  Endpoints for model years (anos). Provides access to year-specific vehicle data, including details for a given year and the trim levels (versões) available for that model-year combination.

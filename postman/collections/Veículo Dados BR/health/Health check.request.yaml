@@ -1,0 +1,8 @@
+$kind: http-request
+description: Verifies that the API is up and reachable. Returns the current service status. Run this before other requests to confirm the server is healthy.
+url: "{{baseUrl}}/health"
+method: GET
+headers:
+  Accept: application/json
+examples: ./.resources/Health check.resources/examples
+order: 1000

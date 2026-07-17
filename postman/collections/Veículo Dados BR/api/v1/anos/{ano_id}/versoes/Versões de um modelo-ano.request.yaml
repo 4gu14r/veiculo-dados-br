@@ -1,0 +1,14 @@
+$kind: http-request
+name: Versões de um modelo/ano
+description: Retorna todas as versões disponíveis para este modelo no ano informado.
+url: "{{baseUrl}}/api/v1/anos/:ano_id/versoes?limite=100&pagina=1"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  limite: "100"
+  pagina: "1"
+pathVariables:
+  ano_id: "657"
+examples: ./.resources/Versões de um modelo-ano.resources/examples
+order: 1000

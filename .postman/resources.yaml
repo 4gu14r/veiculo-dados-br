@@ -1,9 +1,5 @@
-# Use this workspace to collaborate
+cloudResources:
+  collections:
+    ../postman/collections/Veículo Dados BR: 35099417-2d6449db-059a-4f45-8de8-917846a2f078
 workspace:
   id: d6f26411-55c8-4071-91e1-a3bc67fee0af
-
-# All resources in the `postman/` folder are automatically registered in Local View.
-# Point to additional files outside the `postman/` folder to register them individually. Example:
-#localResources:
-#  collections:
-#    - ../tests/E2E Test Collection/
