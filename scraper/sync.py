@@ -4,8 +4,20 @@ Scraping incremental — roda via GitHub Actions toda semana.
 Lógica:
   1. Percorre marcas → modelos → anos/versões (só listagens, rápido)
   2. Para cada versão verifica pela URL se já existe no banco
-  3. Se não existe → baixa a ficha técnica e insere
+  3. Se não existe → baixa a ficha completa e insere
   4. Se existe     → pula (sem rebaixar a performance revisitando fichas antigas)
+
+Resiliência a erros:
+  - Uma falha em qualquer nível (marca, modelo ou versão) NÃO derruba o
+    resto do run — é registrada em `scrape_erros` (ver scraper/erros.py),
+    com a etapa, a URL e o motivo exato, e o scraper segue pro próximo item.
+  - Falhas em nível de versão usam SAVEPOINT (transação aninhada), então
+    não desfazem o que já foi salvo no mesmo modelo/marca antes dela.
+  - Se um item que falhou antes for processado com sucesso num run
+    futuro, o registro de erro correspondente é apagado automaticamente
+    — a tabela `scrape_erros` sempre reflete só o que está pendente agora.
+  - Consulte os erros pendentes via GET /api/v1/scrape-erros ou direto
+    no banco: SELECT url, etapa, tipo_erro, mensagem, tentativas FROM scrape_erros;
 """
 
 import logging
@@ -17,7 +29,9 @@ sys.path.insert(0, ".")
 from sqlalchemy.orm import Session
 
 from api.core.database import SessionLocal
+from api.models.scrape_erro import ScrapeErro
 from api.models.veiculo import Marca, Modelo, ModeloAno, Versao, VersaoDetalhe
+from scraper.erros import registrar_erro, resolver_erro_se_existir
 from scraper.sources.fichacompleta import FichaCompletaScraper
 
 logging.basicConfig(
@@ -55,10 +69,41 @@ def upsert_ano(db: Session, modelo_id: int, ano: int) -> ModeloAno:
     return ma
 
 
+def _processar_versao(db: Session, scraper: FichaCompletaScraper, marca: Marca, modelo: Modelo, versao_raw: dict) -> bool:
+    """
+    Processa uma única versão dentro de um SAVEPOINT.
+    Se falhar, só desfaz essa versão — não afeta o resto do modelo/marca
+    já processado nesta mesma transação. Retorna True se inseriu com sucesso.
+    """
+    contexto = f"{marca.nome} > {modelo.nome} > {versao_raw['ano']} > {versao_raw['versao']}"
+
+    try:
+        with db.begin_nested():
+            ano = upsert_ano(db, modelo.id, versao_raw["ano"])
+            detalhes = scraper.detalhe_versao(versao_raw["url"])
+
+            versao = Versao(
+                modelo_ano_id=ano.id,
+                versao=versao_raw["versao"],
+                url=versao_raw["url"],
+            )
+            db.add(versao)
+            db.flush()
+            db.add(VersaoDetalhe(versao_id=versao.id, **detalhes))
+
+        resolver_erro_se_existir(db, versao_raw["url"])
+        logger.info("Novo: %s", contexto)
+        return True
+
+    except Exception as exc:
+        registrar_erro(db, url=versao_raw["url"], etapa="detalhe_versao", exc=exc, contexto=contexto)
+        return False
+
+
 def sync() -> None:
     db: Session = SessionLocal()
     novos = 0
-    erros = 0
+    falhas = 0
 
     try:
         with FichaCompletaScraper(delay=1.5) as scraper:
@@ -68,54 +113,67 @@ def sync() -> None:
             for marca_raw in marcas:
                 marca = upsert_marca(db, marca_raw["nome"])
 
-                modelos = scraper.listar_modelos(marca_raw["url"])
+                # ── Nível marca: listar modelos ─────────────────────────────
+                try:
+                    modelos = scraper.listar_modelos(marca_raw["url"])
+                    resolver_erro_se_existir(db, marca_raw["url"])
+                except Exception as exc:
+                    registrar_erro(db, url=marca_raw["url"], etapa="listar_modelos", exc=exc, contexto=marca.nome)
+                    db.commit()
+                    falhas += 1
+                    logger.warning("Pulando marca inteira '%s' — não deu pra listar os modelos.", marca.nome)
+                    continue
+
                 for modelo_raw in modelos:
                     modelo = upsert_modelo(db, marca.id, modelo_raw["nome"], modelo_raw["url"])
 
-                    versoes = scraper.listar_versoes(modelo_raw["url"])
+                    # ── Nível modelo: listar versões ────────────────────────
+                    try:
+                        versoes = scraper.listar_versoes(modelo_raw["url"])
+                        resolver_erro_se_existir(db, modelo_raw["url"])
+                    except Exception as exc:
+                        registrar_erro(
+                            db, url=modelo_raw["url"], etapa="listar_versoes", exc=exc,
+                            contexto=f"{marca.nome} > {modelo.nome}",
+                        )
+                        db.commit()
+                        falhas += 1
+                        logger.warning(
+                            "Pulando modelo '%s > %s' — não deu pra listar as versões.",
+                            marca.nome, modelo.nome,
+                        )
+                        continue
+
+                    # ── Nível versão: cada uma é isolada por SAVEPOINT ──────
                     for versao_raw in versoes:
-                        # ── Verifica se já existe pela URL (chave estável) ────
                         existe = db.query(Versao).filter_by(url=versao_raw["url"]).first()
                         if existe:
                             continue
 
-                        logger.info(
-                            "Novo: %s › %s › %s › %s",
-                            marca.nome, modelo.nome,
-                            versao_raw["ano"], versao_raw["versao"],
-                        )
-
-                        try:
-                            ano = upsert_ano(db, modelo.id, versao_raw["ano"])
-                            detalhes = scraper.detalhe_versao(versao_raw["url"])
-
-                            versao = Versao(
-                                modelo_ano_id=ano.id,
-                                versao=versao_raw["versao"],
-                                url=versao_raw["url"],
-                            )
-                            db.add(versao)
-                            db.flush()
-
-                            db.add(VersaoDetalhe(versao_id=versao.id, **detalhes))
+                        if _processar_versao(db, scraper, marca, modelo, versao_raw):
                             novos += 1
+                        else:
+                            falhas += 1
 
-                        except Exception as exc:
-                            logger.warning("Erro ao processar %s: %s", versao_raw["url"], exc)
-                            erros += 1
-                            db.rollback()
-                            continue
-
-                db.commit()
+                    db.commit()
 
     except Exception:
         db.rollback()
-        logger.exception("Erro fatal durante o sync")
+        logger.exception("Erro fatal durante o sync — execução interrompida")
         raise
     finally:
+        pendentes = db.query(ScrapeErro).count()
         db.close()
 
-    logger.info("Sync concluído — %d novas versões inseridas | %d erros", novos, erros)
+    logger.info(
+        "Sync concluído — %d novas versões | %d falhas neste run | %d erros pendentes no total",
+        novos, falhas, pendentes,
+    )
+    if pendentes:
+        logger.info(
+            "Consulte o motivo de cada um via GET /api/v1/scrape-erros "
+            "ou: SELECT url, etapa, tipo_erro, mensagem, tentativas FROM scrape_erros;"
+        )
 
 
 if __name__ == "__main__":

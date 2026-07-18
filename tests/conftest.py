@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from api.core.database import Base, get_db
-from api.models import veiculo  # noqa: F401 — registra todos os models
+from api.models import scrape_erro, veiculo  # noqa: F401 — registra todos os models
 from main import app
 
 # Banco in-memory para testes — isolado, sem dependência de Postgres

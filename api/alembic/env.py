@@ -8,11 +8,12 @@ from sqlalchemy import engine_from_config, pool
 # Garante que o projeto está no path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
 
-from api.core.config import settings
-from api.core.database import Base
+import api.models.scrape_erro  # noqa: F401
 
 # Importa os models para que o Alembic os detecte na metadata
 import api.models.veiculo  # noqa: F401
+from api.core.config import settings
+from api.core.database import Base
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

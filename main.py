@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.core.config import settings
-from api.routers import marcas, modelos, versoes
+from api.routers import marcas, modelos, scrape_erros, versoes
 
 
 @asynccontextmanager
@@ -36,9 +36,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(marcas.router,  prefix="/api/v1/marcas",  tags=["Marcas"])
-    app.include_router(modelos.router, prefix="/api/v1/modelos", tags=["Modelos"])
-    app.include_router(versoes.router, prefix="/api/v1/versoes", tags=["Versões"])
+    app.include_router(marcas.router,       prefix="/api/v1/marcas",       tags=["Marcas"])
+    app.include_router(modelos.router,      prefix="/api/v1/modelos",      tags=["Modelos"])
+    app.include_router(versoes.router,      prefix="/api/v1/versoes",      tags=["Versões"])
+    app.include_router(scrape_erros.router, prefix="/api/v1/scrape-erros", tags=["Scrape Erros"])
 
     @app.get("/health", tags=["Health"], summary="Health check")
     def health():
