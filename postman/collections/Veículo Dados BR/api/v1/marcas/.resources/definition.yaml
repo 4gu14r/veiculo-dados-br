@@ -1,2 +1,9 @@
 $kind: collection
-order: 1000
+description: |-
+  Endpoints relacionados às marcas de veículos cadastradas na base de dados.
+
+  Permite listar todas as marcas disponíveis com suporte a filtro por nome (parcial, case-insensitive) e paginação. A partir de uma marca específica, é possível consultar todos os modelos a ela associados.
+
+  **Endpoints disponíveis:**
+  - `GET /api/v1/marcas` — Lista todas as marcas, com filtro opcional por nome (`q`), limite e página.
+  - `GET /api/v1/marcas/{marca_id}/modelos` — Retorna os modelos de uma marca específica, identificada por `marca_id`.

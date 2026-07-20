@@ -1,2 +1,9 @@
 $kind: collection
-order: 2000
+description: |-
+  Endpoints relacionados aos modelos de veículos disponíveis na base de dados.
+
+  Permite listar todos os modelos com suporte a filtros por nome e por marca (`marca_id`), além de paginação. A partir de um modelo específico, é possível consultar os anos para os quais existem versões cadastradas.
+
+  **Endpoints disponíveis:**
+  - `GET /api/v1/modelos` — Lista todos os modelos, com filtro opcional por nome (`q`), por marca (`marca_id`), limite e página.
+  - `GET /api/v1/modelos/{modelo_id}/anos` — Retorna os anos disponíveis com versões cadastradas para um modelo específico.

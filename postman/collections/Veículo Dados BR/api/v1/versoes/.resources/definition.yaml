@@ -1,2 +1,9 @@
 $kind: collection
-order: 3000
+description: |-
+  Endpoints relacionados às versões de veículos cadastradas na base de dados.
+
+  Permite listar versões com filtros opcionais por ano e por modelo (`modelo_id`), além de paginação. Para uma versão específica, é possível obter a ficha técnica completa, incluindo dados de combustível, tanque, consumo, motor, dimensões, transmissão, suspensão e freios.
+
+  **Endpoints disponíveis:**
+  - `GET /api/v1/versoes` — Lista versões disponíveis, com filtro opcional por ano (`ano`), por modelo (`modelo_id`), limite e página.
+  - `GET /api/v1/versoes/{versao_id}` — Retorna a ficha técnica completa de uma versão específica.
