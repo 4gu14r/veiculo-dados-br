@@ -1,0 +1,11 @@
+$kind: collection
+name: Veículo Dados BR
+description: |-
+  API pública com especificações técnicas de veículos brasileiros.
+
+  Dados de consumo, motor, dimensões, transmissão, suspensão e freios extraídos e mantidos atualizados via scraping.
+
+  Contact Support:  
+  Name: GitHub
+variables:
+  baseUrl: /

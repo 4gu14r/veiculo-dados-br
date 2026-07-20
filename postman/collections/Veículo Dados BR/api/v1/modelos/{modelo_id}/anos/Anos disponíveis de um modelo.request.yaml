@@ -1,0 +1,13 @@
+$kind: http-request
+description: Retorna todos os anos com versões cadastradas para este modelo.
+url: "{{baseUrl}}/api/v1/modelos/:modelo_id/anos?limite=100&pagina=1"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  limite: "100"
+  pagina: "1"
+pathVariables:
+  modelo_id: "8653"
+examples: ./.resources/Anos disponíveis de um modelo.resources/examples
+order: 1000

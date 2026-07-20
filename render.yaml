@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: veiculo-dados-br
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: ENVIRONMENT
+        value: production
+      - key: PORT
+        value: "8000"
+      - key: CORS_ORIGINS
+        value: '["*"]'

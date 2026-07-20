@@ -1,36 +1,50 @@
-# main.py
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
-from sqlmodel import SQLModel
+from fastapi.middleware.cors import CORSMiddleware
 
-from database.database import engine
-import api.models  
+from api.core.config import settings
+from api.routers import marcas, modelos, versoes
 
-from api.routers.marcas import router as marcas_router
-from api.routers.modelos import router as modelos_router
-from api.routers.importacao import router as importacao_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Ligando API: Verificando e criando tabelas no PostgreSQL...")
-    SQLModel.metadata.create_all(engine)
     yield
-    print("Desligando API...")
 
-app = FastAPI(
-    title="Veículo Dados BR API",
-    description="API para especificações de veículos",
-    version="2.0.0",
-    lifespan=lifespan
-)
 
-app.include_router(marcas_router)
-app.include_router(modelos_router)
-app.include_router(importacao_router)
+def create_app() -> FastAPI:
+    app = FastAPI(
+        title="Veículo Dados BR",
+        description=(
+            "API pública com especificações técnicas de veículos brasileiros.\n\n"
+            "Dados de consumo, motor, dimensões, transmissão, suspensão e freios "
+            "extraídos e mantidos atualizados via scraping."
+        ),
+        version="2.0.0",
+        contact={
+            "name": "GitHub",
+            "url": "https://github.com/4gu14r/veiculo-dados-br",
+        },
+        license_info={"name": "MIT"},
+        lifespan=lifespan,
+    )
 
-@app.get("/")
-def read_root():
-    return {
-        "status": "online",
-        "mensagem": "API conectada ao Postgres e tabelas criadas com sucesso!"
-    }
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_methods=["GET"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/", tags=["Health"], summary="Health check")
+    def health():
+        return {"status": "ok", "version": "2.0.0"}
+
+    app.include_router(marcas.router,       prefix="/api/v1/marcas",       tags=["Marcas"])
+    app.include_router(modelos.router,      prefix="/api/v1/modelos",      tags=["Modelos"])
+    app.include_router(versoes.router,      prefix="/api/v1/versoes",      tags=["Versões"])
+
+    return app
+
+
+app = create_app()

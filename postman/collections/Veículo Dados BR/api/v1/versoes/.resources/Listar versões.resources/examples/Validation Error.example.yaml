@@ -1,0 +1,46 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/versoes?ano=770&modelo_id=770&limite=100&pagina=1"
+  method: GET
+  headers:
+    Accept: application/json
+  queryParams:
+    - key: ano
+      value: "770"
+      description: Filtrar por ano
+    - key: modelo_id
+      value: "770"
+      description: Filtrar por ID do modelo
+    - key: limite
+      value: "100"
+    - key: pagina
+      value: "1"
+response:
+  statusCode: 422
+  statusText: Unprocessable Entity (WebDAV) (RFC 4918)
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": [
+          {
+            "loc": [
+              "string",
+              1573
+            ],
+            "msg": "string",
+            "type": "string"
+          },
+          {
+            "loc": [
+              "string",
+              3590
+            ],
+            "msg": "string",
+            "type": "string"
+          }
+        ]
+      }
+order: 2000

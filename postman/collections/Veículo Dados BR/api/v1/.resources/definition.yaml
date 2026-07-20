@@ -1,0 +1,11 @@
+$kind: collection
+description: |-
+  Versão 1 da API Veículo Dados BR. Agrupa todos os recursos disponíveis para consulta de dados de veículos brasileiros.
+
+  Os endpoints estão organizados em três recursos principais:
+
+  - **marcas** — Listagem e busca de marcas de veículos, com acesso aos modelos de cada marca.
+  - **modelos** — Listagem e busca de modelos, com filtro por marca e consulta dos anos disponíveis por modelo.
+  - **versoes** — Listagem de versões com filtros por ano e modelo, e acesso à ficha técnica completa de cada versão.
+
+  Todos os endpoints suportam paginação via parâmetros `limite` e `pagina`, e retornam respostas em JSON.
