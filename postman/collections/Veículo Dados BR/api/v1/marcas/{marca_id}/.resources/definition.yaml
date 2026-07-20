@@ -1,4 +1,2 @@
 $kind: collection
 order: 1000
-description: |-
-  Operations scoped to a specific brand identified by `marca_id`. Retrieve brand details or list all vehicle models belonging to this brand.

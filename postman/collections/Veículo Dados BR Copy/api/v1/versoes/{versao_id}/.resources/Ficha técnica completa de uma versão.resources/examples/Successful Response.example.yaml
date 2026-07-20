@@ -1,0 +1,46 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/versoes/:versao_id"
+  method: GET
+  headers:
+    Accept: application/json
+  pathVariables:
+    versao_id: "6628"
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": 3205,
+        "versao": "string",
+        "url": "string",
+        "detalhe": {
+          "combustivel": "string",
+          "tanque_litros": null,
+          "consumo_cidade_alcool": null,
+          "consumo_cidade_gasolina": null,
+          "consumo_estrada_alcool": 186.27206196620395,
+          "consumo_estrada_gasolina": 3570.5412105556043,
+          "cilindrada_cm3": null,
+          "cilindros": null,
+          "velocidade_max_kmh": null,
+          "zero_a_cem_segundos": null,
+          "comprimento_mm": null,
+          "largura_mm": null,
+          "altura_mm": 1302,
+          "entre_eixos_mm": null,
+          "peso_kg": null,
+          "porta_malas_litros": null,
+          "cambio": null,
+          "tracao": "string",
+          "suspensao_dianteira": "string",
+          "suspensao_traseira": null,
+          "freio_dianteiro": "string",
+          "freio_traseiro": null
+        }
+      }
+order: 1000

@@ -8,6 +8,6 @@ queryParams:
   limite: "100"
   pagina: "1"
 pathVariables:
-  modelo_id: "2774"
+  modelo_id: "8653"
 examples: ./.resources/Anos disponíveis de um modelo.resources/examples
 order: 1000

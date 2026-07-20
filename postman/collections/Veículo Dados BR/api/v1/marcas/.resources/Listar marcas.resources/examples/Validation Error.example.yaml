@@ -26,8 +26,8 @@ response:
         "detail": [
           {
             "loc": [
-              6968,
-              "string"
+              "string",
+              1573
             ],
             "msg": "string",
             "type": "string"
@@ -35,7 +35,7 @@ response:
           {
             "loc": [
               "string",
-              "string"
+              3590
             ],
             "msg": "string",
             "type": "string"

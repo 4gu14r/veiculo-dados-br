@@ -1,4 +1,2 @@
 $kind: collection
 order: 1000
-description: |-
-  Endpoints for vehicle brands (marcas). Supports listing all brands with optional name filtering and pagination, as well as retrieving the full details of a specific brand by its ID.

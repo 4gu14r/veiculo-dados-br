@@ -1,0 +1,32 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/modelos/:modelo_id/anos?limite=100&pagina=1"
+  method: GET
+  headers:
+    Accept: application/json
+  queryParams:
+    limite: "100"
+    pagina: "1"
+  pathVariables:
+    modelo_id: "1979"
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "id": 7032,
+          "ano": 5532,
+          "modelo_id": 2401
+        },
+        {
+          "id": 5658,
+          "ano": 2918,
+          "modelo_id": 5833
+        }
+      ]
+order: 1000

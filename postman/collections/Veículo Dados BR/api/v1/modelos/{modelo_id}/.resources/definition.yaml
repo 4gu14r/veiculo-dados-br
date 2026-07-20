@@ -1,4 +1,2 @@
 $kind: collection
 order: 1000
-description: |-
-  Operations scoped to a specific model identified by `modelo_id`. Retrieve model details or list all available production years for this model.

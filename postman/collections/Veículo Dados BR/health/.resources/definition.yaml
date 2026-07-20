@@ -1,4 +1,0 @@
-$kind: collection
-order: 2000
-description: |-
-  Endpoints for monitoring the operational status of the API. Use the health check request to verify that the service is up and responding before running other requests.

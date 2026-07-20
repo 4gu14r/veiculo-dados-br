@@ -1,6 +1,6 @@
 $kind: http-example
 request:
-  url: "{{baseUrl}}/api/v1/modelos?q=string&marca_id=3841&limite=100&pagina=1"
+  url: "{{baseUrl}}/api/v1/modelos?q=string&marca_id=770&limite=100&pagina=1"
   method: GET
   headers:
     Accept: application/json
@@ -9,7 +9,7 @@ request:
       value: string
       description: Filtrar por nome (parcial, case-insensitive)
     - key: marca_id
-      value: "3841"
+      value: "770"
       description: Filtrar por ID de marca
     - key: limite
       value: "100"
@@ -25,16 +25,16 @@ response:
     content: |-
       [
         {
-          "id": 1790,
+          "id": 1870,
           "nome": "string",
           "url": "string",
-          "marca_id": 5566
+          "marca_id": 6037
         },
         {
-          "id": 6536,
+          "id": 7520,
           "nome": "string",
           "url": "string",
-          "marca_id": 3443
+          "marca_id": 8948
         }
       ]
 order: 1000

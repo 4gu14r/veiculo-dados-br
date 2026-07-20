@@ -8,7 +8,7 @@ request:
     limite: "100"
     pagina: "1"
   pathVariables:
-    modelo_id: "2774"
+    modelo_id: "8653"
 response:
   statusCode: 200
   statusText: OK
@@ -19,14 +19,14 @@ response:
     content: |-
       [
         {
-          "id": 5197,
-          "ano": 9426,
-          "modelo_id": 4398
+          "id": 1405,
+          "ano": 3374,
+          "modelo_id": 2006
         },
         {
-          "id": 4564,
-          "ano": 3114,
-          "modelo_id": 9197
+          "id": 4403,
+          "ano": 1303,
+          "modelo_id": 3260
         }
       ]
 order: 1000

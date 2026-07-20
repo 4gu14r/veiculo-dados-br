@@ -1,0 +1,18 @@
+$kind: http-request
+description: Retorna todos os modelos de uma determinada marca.
+url: "{{baseUrl}}/api/v1/marcas/:marca_id/modelos?q=string&limite=100&pagina=1"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  - key: q
+    value: string
+    description: Filtrar por nome do modelo
+  - key: limite
+    value: "100"
+  - key: pagina
+    value: "1"
+pathVariables:
+  marca_id: "209"
+examples: ./.resources/Modelos de uma marca.resources/examples
+order: 1000

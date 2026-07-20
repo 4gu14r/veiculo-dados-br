@@ -5,7 +5,7 @@ request:
   headers:
     Accept: application/json
   pathVariables:
-    versao_id: "5894"
+    versao_id: "2980"
 response:
   statusCode: 422
   statusText: Unprocessable Entity (WebDAV) (RFC 4918)
@@ -18,8 +18,8 @@ response:
         "detail": [
           {
             "loc": [
-              6968,
-              "string"
+              "string",
+              1573
             ],
             "msg": "string",
             "type": "string"
@@ -27,7 +27,7 @@ response:
           {
             "loc": [
               "string",
-              "string"
+              3590
             ],
             "msg": "string",
             "type": "string"

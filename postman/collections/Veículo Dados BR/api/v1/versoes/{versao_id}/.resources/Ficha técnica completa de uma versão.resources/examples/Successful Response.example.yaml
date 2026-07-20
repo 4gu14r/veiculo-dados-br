@@ -5,7 +5,7 @@ request:
   headers:
     Accept: application/json
   pathVariables:
-    versao_id: "5894"
+    versao_id: "2980"
 response:
   statusCode: 200
   statusText: OK
@@ -15,32 +15,32 @@ response:
     type: json
     content: |-
       {
-        "id": 9140,
+        "id": 1802,
         "versao": "string",
         "url": "string",
         "detalhe": {
           "combustivel": null,
-          "tanque_litros": null,
+          "tanque_litros": 4370.843897459696,
           "consumo_cidade_alcool": null,
-          "consumo_cidade_gasolina": 2659.6218952104077,
-          "consumo_estrada_alcool": 2055.8024590215596,
-          "consumo_estrada_gasolina": 7411.622103546473,
-          "cilindrada_cm3": 9711,
+          "consumo_cidade_gasolina": null,
+          "consumo_estrada_alcool": null,
+          "consumo_estrada_gasolina": null,
+          "cilindrada_cm3": null,
           "cilindros": null,
-          "velocidade_max_kmh": null,
+          "velocidade_max_kmh": 9115,
           "zero_a_cem_segundos": null,
-          "comprimento_mm": 9841,
-          "largura_mm": 1961,
+          "comprimento_mm": null,
+          "largura_mm": null,
           "altura_mm": null,
           "entre_eixos_mm": null,
-          "peso_kg": 5058,
-          "porta_malas_litros": 1564,
+          "peso_kg": null,
+          "porta_malas_litros": null,
           "cambio": null,
-          "tracao": null,
+          "tracao": "string",
           "suspensao_dianteira": "string",
           "suspensao_traseira": "string",
           "freio_dianteiro": null,
-          "freio_traseiro": null
+          "freio_traseiro": "string"
         }
       }
 order: 1000

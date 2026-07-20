@@ -5,6 +5,6 @@ method: GET
 headers:
   Accept: application/json
 pathVariables:
-  versao_id: "5894"
+  versao_id: "2980"
 examples: ./.resources/Ficha técnica completa de uma versão.resources/examples
 order: 1000

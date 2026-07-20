@@ -1,4 +1,2 @@
 $kind: collection
 order: 1000
-description: |-
-  Lists all production years available for a specific vehicle model. Use this to navigate from a model to its year-specific variants.

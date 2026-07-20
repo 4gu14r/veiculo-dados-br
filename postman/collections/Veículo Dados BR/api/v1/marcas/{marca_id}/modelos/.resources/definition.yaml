@@ -1,4 +1,2 @@
 $kind: collection
 order: 1000
-description: |-
-  Lists all vehicle models associated with a specific brand. Useful for navigating the brand → model hierarchy.
