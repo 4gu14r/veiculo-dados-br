@@ -6,8 +6,8 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from api.core.config import settings
-from api.core.database import get_db  # Import da sua conexão com o banco
-from api.routers import marcas, modelos, versoes
+from api.core.database import get_db
+from api.routers import marcas, modelos, scrape_erros, versoes
 
 
 @asynccontextmanager
@@ -39,8 +39,8 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    @app.get("/", tags=["Health"], summary="Health check")
-    def health(db: Session = Depends(get_db)):
+    # Função de verificação de saúde com banco de dados
+    def check_health(db: Session = Depends(get_db)):
         try:
             db.execute(text("SELECT 1"))
             return {"status": "ok", "version": "2.0.0", "database": "connected"}
@@ -50,9 +50,15 @@ def create_app() -> FastAPI:
                 detail=f"Erro de conexão com o banco de dados: {str(e)}",
             )
 
+    # 1. Atende tanto a raiz (/) quanto a rota (/health) esperada pelos testes
+    app.get("/", tags=["Health"], summary="Health check")(check_health)
+    app.get("/health", tags=["Health"], summary="Health check")(check_health)
+
+    # 2. Inclusão dos Routers (incluindo o scrape_erros que estava faltando)
     app.include_router(marcas.router, prefix="/api/v1/marcas", tags=["Marcas"])
     app.include_router(modelos.router, prefix="/api/v1/modelos", tags=["Modelos"])
     app.include_router(versoes.router, prefix="/api/v1/versoes", tags=["Versões"])
+    app.include_router(scrape_erros.router, prefix="/api/v1/erros", tags=["Erros"])
 
     return app
 
