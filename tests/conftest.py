@@ -39,6 +39,7 @@ def db():
 @pytest.fixture
 def client(db):
     """TestClient com o banco de testes injetado via dependency override."""
+
     def override_get_db():
         yield db
 

@@ -15,9 +15,10 @@ class ScrapeErro(Base):
       3. Quando o item finalmente for processado com sucesso, o registro
          de erro correspondente é removido automaticamente (ver scraper/erros.py).
     """
+
     __tablename__ = "scrape_erros"
 
-    id:  Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
     url: Mapped[str] = mapped_column(Text, nullable=False, unique=True, index=True)
 
@@ -26,11 +27,13 @@ class ScrapeErro(Base):
     contexto: Mapped[str | None] = mapped_column(String(255))
 
     tipo_erro: Mapped[str] = mapped_column(String(100), nullable=False)
-    mensagem:  Mapped[str] = mapped_column(Text, nullable=False)
+    mensagem: Mapped[str] = mapped_column(Text, nullable=False)
 
     tentativas: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
 
-    primeira_ocorrencia: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    ultima_ocorrencia:   Mapped[datetime] = mapped_column(
+    primeira_ocorrencia: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    ultima_ocorrencia: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )

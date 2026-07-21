@@ -50,7 +50,11 @@ def registrar_erro(
     db.flush()
     logger.warning(
         "[%s] %s | tentativa nº%d | %s: %s",
-        etapa, contexto or url, erro.tentativas, erro.tipo_erro, erro.mensagem,
+        etapa,
+        contexto or url,
+        erro.tentativas,
+        erro.tipo_erro,
+        erro.mensagem,
     )
 
 

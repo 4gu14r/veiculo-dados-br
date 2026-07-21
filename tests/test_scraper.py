@@ -4,9 +4,12 @@ Garante que seletores HTML convertam os dados corretamente sem bater na rede.
 """
 
 from unittest.mock import patch
+
 import pytest
 from bs4 import BeautifulSoup
+
 from scraper.sources.fichacompleta import FichaCompletaScraper
+
 
 # ── Fixture para instanciar o Scraper ──────────────────────────────────────────
 @pytest.fixture
@@ -16,6 +19,7 @@ def scraper():
 
 
 # ── Testes: Listar Marcas ──────────────────────────────────────────────────────
+
 
 def test_listar_marcas_sucesso(scraper):
     html_mock = """
@@ -39,6 +43,7 @@ def test_listar_marcas_sucesso(scraper):
 
 # ── Testes: Listar Modelos ─────────────────────────────────────────────────────
 
+
 def test_listar_modelos_filtragem_e_unicidade(scraper):
     html_mock = """
     <div>
@@ -61,6 +66,7 @@ def test_listar_modelos_filtragem_e_unicidade(scraper):
 
 
 # ── Testes: Listar Versões ─────────────────────────────────────────────────────
+
 
 def test_listar_versoes_com_deduplicação(scraper):
     html_mock = """
@@ -92,6 +98,7 @@ def test_listar_versoes_com_deduplicação(scraper):
 
 
 # ── Testes: Detalhe da Versão (Ficha Técnica) ──────────────────────────────────
+
 
 def test_detalhe_versao_parsing_completo(scraper):
     html_mock = """
@@ -131,7 +138,7 @@ def test_detalhe_versao_parsing_completo(scraper):
 
     # Validações de conversão de tipos (strings, ints limpando caracteres especiais)
     assert dados["combustivel"] == "Gasolina"
-    assert dados["cilindrada_cm3"] == 2771      # Limpou o ponto e converteu para int
-    assert dados["comprimento_mm"] == 4790      # Converteu para int
-    assert dados["largura_mm"] == 1777          # Validou o grupo de dimensões com sucesso
-    assert dados["tanque_litros"] is None       # Campo ausente vira None de forma segura
+    assert dados["cilindrada_cm3"] == 2771  # Limpou o ponto e converteu para int
+    assert dados["comprimento_mm"] == 4790  # Converteu para int
+    assert dados["largura_mm"] == 1777  # Validou o grupo de dimensões com sucesso
+    assert dados["tanque_litros"] is None  # Campo ausente vira None de forma segura

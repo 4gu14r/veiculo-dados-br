@@ -43,20 +43,16 @@ def create_app() -> FastAPI:
     def health(db: Session = Depends(get_db)):
         try:
             db.execute(text("SELECT 1"))
-            return {
-                "status": "ok",
-                "version": "2.0.0",
-                "database": "connected"
-            }
+            return {"status": "ok", "version": "2.0.0", "database": "connected"}
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Erro de conexão com o banco de dados: {str(e)}"
+                detail=f"Erro de conexão com o banco de dados: {str(e)}",
             )
 
-    app.include_router(marcas.router,       prefix="/api/v1/marcas",       tags=["Marcas"])
-    app.include_router(modelos.router,      prefix="/api/v1/modelos",      tags=["Modelos"])
-    app.include_router(versoes.router,      prefix="/api/v1/versoes",      tags=["Versões"])
+    app.include_router(marcas.router, prefix="/api/v1/marcas", tags=["Marcas"])
+    app.include_router(modelos.router, prefix="/api/v1/modelos", tags=["Modelos"])
+    app.include_router(versoes.router, prefix="/api/v1/versoes", tags=["Versões"])
 
     return app
 
