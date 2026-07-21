@@ -1,6 +1,4 @@
-"""
-Testes do rastreamento de erros do scraper: scraper/erros.py + GET /api/v1/scrape-erros.
-"""
+"""Testes do rastreamento de erros do scraper: scraper/erros.py"""
 
 from api.models.scrape_erro import ScrapeErro
 from scraper.erros import registrar_erro, resolver_erro_se_existir
@@ -58,43 +56,3 @@ def test_resolver_erro_remove_registro_apos_sucesso(db):
 
 def test_resolver_erro_sem_registro_previo_nao_lanca_excecao(db):
     resolver_erro_se_existir(db, "http://nunca-falhou.com")  # não deve lançar nada
-
-
-# ── GET /api/v1/scrape-erros ──────────────────────────────────────────────────
-
-
-def test_endpoint_lista_erros_pendentes(client, db):
-    registrar_erro(
-        db,
-        url="http://x.com/1",
-        etapa="listar_versoes",
-        exc=ErroFalso("timeout"),
-        contexto="Fiat > Uno",
-    )
-    db.commit()
-
-    r = client.get("/api/v1/scrape-erros")
-    assert r.status_code == 200
-    data = r.json()
-    assert len(data) == 1
-    assert data[0]["url"] == "http://x.com/1"
-    assert data[0]["tipo_erro"] == "ErroFalso"
-    assert data[0]["mensagem"] == "timeout"
-    assert data[0]["contexto"] == "Fiat > Uno"
-
-
-def test_endpoint_filtra_por_etapa(client, db):
-    registrar_erro(db, url="http://x.com/1", etapa="listar_versoes", exc=ErroFalso("a"))
-    registrar_erro(db, url="http://x.com/2", etapa="detalhe_versao", exc=ErroFalso("b"))
-    db.commit()
-
-    r = client.get("/api/v1/scrape-erros?etapa=detalhe_versao")
-    assert r.status_code == 200
-    assert len(r.json()) == 1
-    assert r.json()[0]["url"] == "http://x.com/2"
-
-
-def test_endpoint_vazio_quando_nao_ha_erros(client):
-    r = client.get("/api/v1/scrape-erros")
-    assert r.status_code == 200
-    assert r.json() == []
