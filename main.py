@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from api.core.config import settings
+from api.core.database import get_db  # Import da sua conexão com o banco
 from api.routers import marcas, modelos, versoes
 
 
@@ -37,8 +40,19 @@ def create_app() -> FastAPI:
     )
 
     @app.get("/", tags=["Health"], summary="Health check")
-    def health():
-        return {"status": "ok", "version": "2.0.0"}
+    def health(db: Session = Depends(get_db)):
+        try:
+            db.execute(text("SELECT 1"))
+            return {
+                "status": "ok",
+                "version": "2.0.0",
+                "database": "connected"
+            }
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Erro de conexão com o banco de dados: {str(e)}"
+            )
 
     app.include_router(marcas.router,       prefix="/api/v1/marcas",       tags=["Marcas"])
     app.include_router(modelos.router,      prefix="/api/v1/modelos",      tags=["Modelos"])
