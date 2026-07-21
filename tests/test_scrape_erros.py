@@ -12,10 +12,14 @@ class ErroFalso(Exception):
 
 # ── registrar_erro ──────────────────────────────────────────────────────────────
 
+
 def test_registrar_erro_cria_registro(db):
     registrar_erro(
-        db, url="http://x.com/1", etapa="detalhe_versao",
-        exc=ErroFalso("html mudou"), contexto="Fiat > Uno",
+        db,
+        url="http://x.com/1",
+        etapa="detalhe_versao",
+        exc=ErroFalso("html mudou"),
+        contexto="Fiat > Uno",
     )
     db.commit()
 
@@ -41,6 +45,7 @@ def test_registrar_erro_na_mesma_url_incrementa_tentativas(db):
 
 # ── resolver_erro_se_existir ──────────────────────────────────────────────────
 
+
 def test_resolver_erro_remove_registro_apos_sucesso(db):
     registrar_erro(db, url="http://x.com/1", etapa="detalhe_versao", exc=ErroFalso("erro"))
     db.commit()
@@ -57,10 +62,14 @@ def test_resolver_erro_sem_registro_previo_nao_lanca_excecao(db):
 
 # ── GET /api/v1/scrape-erros ──────────────────────────────────────────────────
 
+
 def test_endpoint_lista_erros_pendentes(client, db):
     registrar_erro(
-        db, url="http://x.com/1", etapa="listar_versoes",
-        exc=ErroFalso("timeout"), contexto="Fiat > Uno",
+        db,
+        url="http://x.com/1",
+        etapa="listar_versoes",
+        exc=ErroFalso("timeout"),
+        contexto="Fiat > Uno",
     )
     db.commit()
 

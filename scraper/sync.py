@@ -30,30 +30,31 @@ def upsert_marca(db: Session, nome: str) -> tuple[Marca, bool]:
     """Retorna a Marca e um booleano indicando se ela é NOVA no banco."""
     nome_formatado = nome.strip().title()
     marca = db.query(Marca).filter(func.lower(Marca.nome) == func.lower(nome_formatado)).first()
-    
+
     if not marca:
         marca = Marca(nome=nome_formatado)
         db.add(marca)
         db.flush()
         return marca, True
-        
+
     return marca, False
 
 
 def upsert_modelo(db: Session, marca_id: int, nome: str, url: str) -> tuple[Modelo, bool]:
     """Retorna o Modelo e um booleano indicando se ele é NOVO no banco."""
     nome_formatado = nome.strip().title()
-    modelo = db.query(Modelo).filter(
-        Modelo.marca_id == marca_id,
-        func.lower(Modelo.nome) == func.lower(nome_formatado)
-    ).first()
-    
+    modelo = (
+        db.query(Modelo)
+        .filter(Modelo.marca_id == marca_id, func.lower(Modelo.nome) == func.lower(nome_formatado))
+        .first()
+    )
+
     if not modelo:
         modelo = Modelo(marca_id=marca_id, nome=nome_formatado, url=url)
         db.add(modelo)
         db.flush()
         return modelo, True
-        
+
     return modelo, False
 
 
@@ -66,31 +67,37 @@ def upsert_ano(db: Session, modelo_id: int, ano: int) -> ModeloAno:
     return ma
 
 
-def _processar_versao(db: Session, scraper: FichaCompletaScraper, marca: Marca, modelo: Modelo, versao_raw: dict) -> str:
+def _processar_versao(
+    db: Session, scraper: FichaCompletaScraper, marca: Marca, modelo: Modelo, versao_raw: dict
+) -> str:
     """
     Processa uma versão de forma estritamente incremental.
     Se já existir no banco, ignora completamente sem alterar o registro antigo.
     """
     versao_crua = versao_raw["versao"].strip()
-    
+
     # Padroniza como o nome DEVERIA ser caso precise ser inserido
     if versao_crua.lower().startswith(modelo.nome.lower()):
         versao_formatada = versao_crua
     else:
         versao_formatada = f"{modelo.nome} {versao_crua}"
-        
+
     contexto = f"{marca.nome} > {modelo.nome} > {versao_raw['ano']} > {versao_formatada}"
 
     try:
         ano = upsert_ano(db, modelo.id, versao_raw["ano"])
 
         # Busca se a versão já existe por URL ou por nome (tanto o composto quanto o cru antigo)
-        existe = db.query(Versao).filter(
-            Versao.modelo_ano_id == ano.id,
-            (Versao.url == versao_raw["url"]) |
-            (func.lower(Versao.versao) == func.lower(versao_formatada)) |
-            (func.lower(Versao.versao) == func.lower(versao_crua))
-        ).first()
+        existe = (
+            db.query(Versao)
+            .filter(
+                Versao.modelo_ano_id == ano.id,
+                (Versao.url == versao_raw["url"])
+                | (func.lower(Versao.versao) == func.lower(versao_formatada))
+                | (func.lower(Versao.versao) == func.lower(versao_crua)),
+            )
+            .first()
+        )
 
         # 🛑 SE JÁ EXISTE, PARA AQUI. Não atualiza URL, não altera texto, não faz nada.
         if existe:
@@ -114,7 +121,9 @@ def _processar_versao(db: Session, scraper: FichaCompletaScraper, marca: Marca, 
         return "INSERIDO"
 
     except Exception as exc:
-        registrar_erro(db, url=versao_raw["url"], etapa="detalhe_versao", exc=exc, contexto=contexto)
+        registrar_erro(
+            db, url=versao_raw["url"], etapa="detalhe_versao", exc=exc, contexto=contexto
+        )
         return "FALHA"
 
 
@@ -137,13 +146,21 @@ def sync() -> None:
                     modelos = scraper.listar_modelos(marca_raw["url"])
                     resolver_erro_se_existir(db, marca_raw["url"])
                 except Exception as exc:
-                    registrar_erro(db, url=marca_raw["url"], etapa="listar_modelos", exc=exc, contexto=marca.nome)
+                    registrar_erro(
+                        db,
+                        url=marca_raw["url"],
+                        etapa="listar_modelos",
+                        exc=exc,
+                        contexto=marca.nome,
+                    )
                     db.commit()
                     falhas += 1
                     continue
 
                 for modelo_raw in modelos:
-                    modelo, modelo_eh_novo = upsert_modelo(db, marca.id, modelo_raw["nome"], modelo_raw["url"])
+                    modelo, modelo_eh_novo = upsert_modelo(
+                        db, marca.id, modelo_raw["nome"], modelo_raw["url"]
+                    )
                     if modelo_eh_novo:
                         logger.info("📦 Novo Modelo: %s > %s", marca.nome, modelo.nome)
 
@@ -152,7 +169,10 @@ def sync() -> None:
                         resolver_erro_se_existir(db, modelo_raw["url"])
                     except Exception as exc:
                         registrar_erro(
-                            db, url=modelo_raw["url"], etapa="listar_versoes", exc=exc,
+                            db,
+                            url=modelo_raw["url"],
+                            etapa="listar_versoes",
+                            exc=exc,
                             contexto=f"{marca.nome} > {modelo.nome}",
                         )
                         db.commit()
@@ -173,7 +193,12 @@ def sync() -> None:
                             model_pulados += 1
 
                     if model_pulados > 0:
-                        logger.info("⏭️ %s > %s: %d versão(ões) mantida(s) do banco antigo (pulada(s))", marca.nome, modelo.nome, model_pulados)
+                        logger.info(
+                            "⏭️ %s > %s: %d versão(ões) mantida(s) do banco antigo (pulada(s))",
+                            marca.nome,
+                            modelo.nome,
+                            model_pulados,
+                        )
 
                     db.commit()
 
@@ -187,7 +212,9 @@ def sync() -> None:
 
     logger.info(
         "Sync concluído — %d novas versões | %d falhas neste run | %d erros pendentes no total",
-        novos, falhas, pendentes,
+        novos,
+        falhas,
+        pendentes,
     )
 
 

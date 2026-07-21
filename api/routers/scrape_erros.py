@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+
 from api.core.database import get_db
 from api.models.scrape_erro import ScrapeErro
 from api.schemas.scrape_erro import ScrapeErroSchema
 
 router = APIRouter()
+
 
 @router.get(
     "",

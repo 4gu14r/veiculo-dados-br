@@ -38,7 +38,7 @@ def seed(sqlite_path: str) -> None:
         print("▶ Importando marcas...")
         marcas_map: dict[int, int] = {}  # sqlite_id -> postgres_id
 
-        for (sqlite_id, nome) in cur.execute("SELECT id, nome FROM marcas ORDER BY id"):
+        for sqlite_id, nome in cur.execute("SELECT id, nome FROM marcas ORDER BY id"):
             existing = db.query(Marca).filter_by(nome=nome).first()
             if not existing:
                 marca = Marca(nome=nome)
@@ -56,7 +56,7 @@ def seed(sqlite_path: str) -> None:
         modelos_map: dict[int, int] = {}
 
         rows = list(cur.execute("SELECT id, marca_id, nome, url FROM modelos ORDER BY id"))
-        for (sqlite_id, sqlite_marca_id, nome, url) in rows:
+        for sqlite_id, sqlite_marca_id, nome, url in rows:
             pg_marca_id = marcas_map[sqlite_marca_id]
             existing = db.query(Modelo).filter_by(marca_id=pg_marca_id, nome=nome).first()
             if not existing:
@@ -75,7 +75,7 @@ def seed(sqlite_path: str) -> None:
         anos_map: dict[int, int] = {}
 
         rows = list(cur.execute("SELECT id, modelo_id, ano FROM modelos_anos ORDER BY id"))
-        for (sqlite_id, sqlite_modelo_id, ano) in rows:
+        for sqlite_id, sqlite_modelo_id, ano in rows:
             pg_modelo_id = modelos_map[sqlite_modelo_id]
             existing = db.query(ModeloAno).filter_by(modelo_id=pg_modelo_id, ano=ano).first()
             if not existing:
@@ -91,16 +91,15 @@ def seed(sqlite_path: str) -> None:
 
         # ── Versões + Detalhes ────────────────────────────────────────────────
         print("▶ Importando versões e fichas técnicas...")
-        versoes_rows = list(cur.execute(
-            "SELECT id, modelo_ano_id, versao, url FROM versoes ORDER BY id"
-        ))
+        versoes_rows = list(
+            cur.execute("SELECT id, modelo_ano_id, versao, url FROM versoes ORDER BY id")
+        )
         detalhes_dict: dict[int, tuple] = {
-            row[1]: row
-            for row in cur.execute("SELECT * FROM versoes_detalhes ORDER BY versao_id")
+            row[1]: row for row in cur.execute("SELECT * FROM versoes_detalhes ORDER BY versao_id")
         }
 
         total = 0
-        for (sqlite_id, sqlite_ano_id, versao_nome, url) in versoes_rows:
+        for sqlite_id, sqlite_ano_id, versao_nome, url in versoes_rows:
             pg_ano_id = anos_map[sqlite_ano_id]
             existing = db.query(Versao).filter_by(url=url).first()
             if existing:
@@ -117,39 +116,60 @@ def seed(sqlite_path: str) -> None:
             # Detalhe
             d_row = detalhes_dict.get(sqlite_id)
             if d_row:
-                (_, _, combustivel, tanque_litros,
-                 consumo_cidade_alcool, consumo_cidade_gasolina,
-                 consumo_estrada_alcool, consumo_estrada_gasolina,
-                 cilindrada_cm3, cilindros, velocidade_max_kmh, zero_a_cem_segundos,
-                 comprimento_mm, largura_mm, altura_mm, entre_eixos_mm, peso_kg, porta_malas_litros,
-                 cambio, tracao, suspensao_dianteira, suspensao_traseira,
-                 freio_dianteiro, freio_traseiro) = d_row
+                (
+                    _,
+                    _,
+                    combustivel,
+                    tanque_litros,
+                    consumo_cidade_alcool,
+                    consumo_cidade_gasolina,
+                    consumo_estrada_alcool,
+                    consumo_estrada_gasolina,
+                    cilindrada_cm3,
+                    cilindros,
+                    velocidade_max_kmh,
+                    zero_a_cem_segundos,
+                    comprimento_mm,
+                    largura_mm,
+                    altura_mm,
+                    entre_eixos_mm,
+                    peso_kg,
+                    porta_malas_litros,
+                    cambio,
+                    tracao,
+                    suspensao_dianteira,
+                    suspensao_traseira,
+                    freio_dianteiro,
+                    freio_traseiro,
+                ) = d_row
 
-                db.add(VersaoDetalhe(
-                    versao_id=v.id,
-                    combustivel=limpar_texto(combustivel),
-                    tanque_litros=tanque_litros,
-                    consumo_cidade_alcool=consumo_cidade_alcool,
-                    consumo_cidade_gasolina=consumo_cidade_gasolina,
-                    consumo_estrada_alcool=consumo_estrada_alcool,
-                    consumo_estrada_gasolina=consumo_estrada_gasolina,
-                    cilindrada_cm3=cilindrada_cm3,
-                    cilindros=limpar_texto(cilindros),
-                    velocidade_max_kmh=velocidade_max_kmh,
-                    zero_a_cem_segundos=zero_a_cem_segundos,
-                    comprimento_mm=comprimento_mm,
-                    largura_mm=largura_mm,
-                    altura_mm=altura_mm,
-                    entre_eixos_mm=entre_eixos_mm,
-                    peso_kg=peso_kg,
-                    porta_malas_litros=porta_malas_litros,
-                    cambio=limpar_texto(cambio),
-                    tracao=limpar_texto(tracao),
-                    suspensao_dianteira=limpar_texto(suspensao_dianteira),
-                    suspensao_traseira=limpar_texto(suspensao_traseira),
-                    freio_dianteiro=limpar_texto(freio_dianteiro),
-                    freio_traseiro=limpar_texto(freio_traseiro),
-                ))
+                db.add(
+                    VersaoDetalhe(
+                        versao_id=v.id,
+                        combustivel=limpar_texto(combustivel),
+                        tanque_litros=tanque_litros,
+                        consumo_cidade_alcool=consumo_cidade_alcool,
+                        consumo_cidade_gasolina=consumo_cidade_gasolina,
+                        consumo_estrada_alcool=consumo_estrada_alcool,
+                        consumo_estrada_gasolina=consumo_estrada_gasolina,
+                        cilindrada_cm3=cilindrada_cm3,
+                        cilindros=limpar_texto(cilindros),
+                        velocidade_max_kmh=velocidade_max_kmh,
+                        zero_a_cem_segundos=zero_a_cem_segundos,
+                        comprimento_mm=comprimento_mm,
+                        largura_mm=largura_mm,
+                        altura_mm=altura_mm,
+                        entre_eixos_mm=entre_eixos_mm,
+                        peso_kg=peso_kg,
+                        porta_malas_litros=porta_malas_litros,
+                        cambio=limpar_texto(cambio),
+                        tracao=limpar_texto(tracao),
+                        suspensao_dianteira=limpar_texto(suspensao_dianteira),
+                        suspensao_traseira=limpar_texto(suspensao_traseira),
+                        freio_dianteiro=limpar_texto(freio_dianteiro),
+                        freio_traseiro=limpar_texto(freio_traseiro),
+                    )
+                )
 
             total += 1
             if total % 500 == 0:

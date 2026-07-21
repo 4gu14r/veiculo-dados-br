@@ -28,10 +28,10 @@ def detalhe_ano(ano_id: int, db: Session = Depends(get_db)):
     description="Retorna todas as versões disponíveis para este modelo no ano informado.",
 )
 def versoes_do_ano(
-    ano_id:  int,
-    limite:  int     = Query(100, ge=1, le=200),
-    pagina:  int     = Query(1, ge=1),
-    db:      Session = Depends(get_db),
+    ano_id: int,
+    limite: int = Query(100, ge=1, le=200),
+    pagina: int = Query(1, ge=1),
+    db: Session = Depends(get_db),
 ):
     if not db.get(ModeloAno, ano_id):
         raise HTTPException(status_code=404, detail="Ano não encontrado.")

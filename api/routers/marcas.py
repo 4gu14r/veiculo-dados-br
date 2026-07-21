@@ -16,10 +16,10 @@ router = APIRouter()
     description="Retorna todas as marcas cadastradas. Suporta filtro por nome.",
 )
 def listar_marcas(
-    q:      str | None = Query(None, description="Filtrar por nome (parcial, case-insensitive)"),
-    limite: int        = Query(100, ge=1, le=200, description="Itens por página"),
-    pagina: int        = Query(1, ge=1, description="Número da página"),
-    db:     Session    = Depends(get_db),
+    q: str | None = Query(None, description="Filtrar por nome (parcial, case-insensitive)"),
+    limite: int = Query(100, ge=1, le=200, description="Itens por página"),
+    pagina: int = Query(1, ge=1, description="Número da página"),
+    db: Session = Depends(get_db),
 ):
     stmt = select(Marca).order_by(Marca.nome)
     if q:
@@ -36,10 +36,10 @@ def listar_marcas(
 )
 def modelos_da_marca(
     marca_id: int,
-    q:        str | None = Query(None, description="Filtrar por nome do modelo"),
-    limite:   int        = Query(100, ge=1, le=200),
-    pagina:   int        = Query(1, ge=1),
-    db:       Session    = Depends(get_db),
+    q: str | None = Query(None, description="Filtrar por nome do modelo"),
+    limite: int = Query(100, ge=1, le=200),
+    pagina: int = Query(1, ge=1),
+    db: Session = Depends(get_db),
 ):
     if not db.get(Marca, marca_id):
         raise HTTPException(status_code=404, detail="Marca não encontrada.")

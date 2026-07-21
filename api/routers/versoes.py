@@ -16,16 +16,17 @@ router = APIRouter()
     description="Retorna versões com filtros opcionais por ano ou modelo.",
 )
 def listar_versoes(
-    ano:       int | None = Query(None, description="Filtrar por ano"),
+    ano: int | None = Query(None, description="Filtrar por ano"),
     modelo_id: int | None = Query(None, description="Filtrar por ID do modelo"),
-    limite:    int        = Query(100, ge=1, le=200),
-    pagina:    int        = Query(1, ge=1),
-    db:        Session    = Depends(get_db),
+    limite: int = Query(100, ge=1, le=200),
+    pagina: int = Query(1, ge=1),
+    db: Session = Depends(get_db),
 ):
     stmt = select(Versao).order_by(Versao.versao)
 
     if ano or modelo_id:
         from api.models.veiculo import ModeloAno
+
         stmt = stmt.join(ModeloAno, Versao.modelo_ano_id == ModeloAno.id)
         if ano:
             stmt = stmt.where(ModeloAno.ano == ano)
@@ -46,11 +47,7 @@ def listar_versoes(
     ),
 )
 def detalhe_versao(versao_id: int, db: Session = Depends(get_db)):
-    stmt = (
-        select(Versao)
-        .options(joinedload(Versao.detalhe))
-        .where(Versao.id == versao_id)
-    )
+    stmt = select(Versao).options(joinedload(Versao.detalhe)).where(Versao.id == versao_id)
     versao = db.scalars(stmt).first()
     if not versao:
         raise HTTPException(status_code=404, detail="Versão não encontrada.")

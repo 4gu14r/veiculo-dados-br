@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 class ScrapeErroSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id:  int
+    id: int
     url: str
     etapa: str
     contexto: str | None = None

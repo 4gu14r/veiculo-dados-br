@@ -7,6 +7,7 @@ from api.models.veiculo import Marca, Modelo, ModeloAno, Versao, VersaoDetalhe
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
+
 def criar_marca(db, nome="Fiat") -> Marca:
     m = Marca(nome=nome)
     db.add(m)
@@ -28,7 +29,9 @@ def criar_ano(db, modelo_id: int, ano=2020) -> ModeloAno:
     return ma
 
 
-def criar_versao(db, modelo_ano_id: int, versao="Fire 1.0", url="http://exemplo.com/fire") -> Versao:
+def criar_versao(
+    db, modelo_ano_id: int, versao="Fire 1.0", url="http://exemplo.com/fire"
+) -> Versao:
     v = Versao(modelo_ano_id=modelo_ano_id, versao=versao, url=url)
     db.add(v)
     db.flush()
@@ -53,6 +56,7 @@ def criar_detalhe(db, versao_id: int) -> VersaoDetalhe:
 
 # ── Health ─────────────────────────────────────────────────────────────────────
 
+
 def test_health(client):
     r = client.get("/health")
     assert r.status_code == 200
@@ -60,6 +64,7 @@ def test_health(client):
 
 
 # ── Marcas ─────────────────────────────────────────────────────────────────────
+
 
 def test_listar_marcas_vazio(client):
     r = client.get("/api/v1/marcas")
@@ -100,6 +105,7 @@ def test_modelos_da_marca(client, db):
 
 # ── Modelos ────────────────────────────────────────────────────────────────────
 
+
 def test_listar_modelos(client, db):
     marca = criar_marca(db)
     criar_modelo(db, marca.id)
@@ -129,10 +135,11 @@ def test_anos_do_modelo(client, db):
 
 # ── Versões ────────────────────────────────────────────────────────────────────
 
+
 def test_detalhe_versao_com_ficha(client, db):
-    marca  = criar_marca(db)
+    marca = criar_marca(db)
     modelo = criar_modelo(db, marca.id)
-    ano    = criar_ano(db, modelo.id)
+    ano = criar_ano(db, modelo.id)
     versao = criar_versao(db, ano.id)
     criar_detalhe(db, versao.id)
     db.commit()
@@ -152,9 +159,9 @@ def test_versao_nao_encontrada(client):
 
 
 def test_listar_versoes_por_ano(client, db):
-    marca  = criar_marca(db)
+    marca = criar_marca(db)
     modelo = criar_modelo(db, marca.id)
-    ano    = criar_ano(db, modelo.id, 2019)
+    ano = criar_ano(db, modelo.id, 2019)
     criar_versao(db, ano.id, "1.0", "http://x.com/1")
     db.commit()
 
@@ -165,13 +172,13 @@ def test_listar_versoes_por_ano(client, db):
 
 def test_listar_versoes_por_modelo_e_ano(client, db):
     """Cobre o caso que antes era resolvido por /api/v1/anos/{id}/versoes."""
-    marca  = criar_marca(db)
+    marca = criar_marca(db)
     modelo = criar_modelo(db, marca.id)
     ano_2022 = criar_ano(db, modelo.id, 2022)
     ano_2023 = criar_ano(db, modelo.id, 2023)
-    criar_versao(db, ano_2022.id, "1.0 Fire Flex",  "http://a.com/1")
+    criar_versao(db, ano_2022.id, "1.0 Fire Flex", "http://a.com/1")
     criar_versao(db, ano_2022.id, "1.4 Attractive", "http://a.com/2")
-    criar_versao(db, ano_2023.id, "1.0 Firefly",    "http://a.com/3")
+    criar_versao(db, ano_2023.id, "1.0 Firefly", "http://a.com/3")
     db.commit()
 
     r = client.get(f"/api/v1/versoes?modelo_id={modelo.id}&ano=2022")
